@@ -1,6 +1,9 @@
+require('dotenv').config()
 const path = require('path')
 const fastifyStatic = require('fastify-static')
+const cors = require('fastify-cors')
 const { pdfCreateToStream } = require('./lib/pdf')
+
 
 
 const pdfOptions = {
@@ -13,7 +16,7 @@ const pdfOptions = {
 
 const fastify = require('fastify')({ logger: true })
 
-fastify.register(require('fastify-cors'), { origin: '*', credentials: true })
+fastify.register(cors, { origin: '*',credentials:true,methods:['POST'], })
 fastify.register(require('fastify-formbody'))
 
 fastify.register(fastifyStatic, {
@@ -29,12 +32,17 @@ fastify.post('/api/htmlToPdf', async (req, res) => {
     res.header('Content-Type', 'application/pdf');
     res.header('Content-Disposition', `attachment; filename=${name}.pdf`);
 
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+    //res.header('', '');
+
     
     return stream
 })
 
 
-fastify.listen(3000, (err) => {
+fastify.listen(process.env.PORT || 3000, (err) => {
     if (err) throw err
 
 })
